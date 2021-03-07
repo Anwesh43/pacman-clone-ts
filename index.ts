@@ -1,10 +1,10 @@
 const w : number = window.innerWidth * 0.8 
 const h : number = window.innerHeight * 0.8 
-const delay : number = 60
-const PAC_MAN_COLOR : string = "orange"
-const BACKGROUND_COLOR : string = "#bdbdbd"
-const SPEED : number = 10 
-const OPENING_SPEED : number = 5 
+const delay : number = 20
+const PAC_MAN_COLOR : string = "#f1c40f"
+const BACKGROUND_COLOR : string = "#212121"
+const SPEED : number = 2 
+const OPENING_SPEED : number = 1 
 const MAX_DEG : number = 30 
 const PAC_MAN_RFACTOR : number = 12.3 
 
@@ -100,8 +100,40 @@ class Renderer {
                 this.pacMan.toRight()
             }
         };
-        codeFnMap[code]()
+        if (code in codeFnMap) {
+            codeFnMap[code]()
+        } else {
+            console.log("Plese enter key up, right, left or down")
+        }
 
+    }
+
+}
+
+class Timer {
+    
+    curr : Date 
+    totalDiff : number = 0
+    start() {
+        this.curr = new Date()
+        console.log(`started at ${this.curr.toLocaleDateString()}`)
+    }
+
+
+    check() {
+        const curr = new Date()
+        const diff : number = curr.getTime() - this.curr.getTime()
+        this.curr = curr 
+        this.totalDiff += diff
+        return diff
+    }
+
+    shouldRender() :  Boolean {
+        const result : Boolean = this.totalDiff >= delay 
+        if (result) {
+            this.totalDiff = 0 
+        }
+        return result 
     }
 
 }
@@ -110,11 +142,24 @@ class Loop {
     
     interval : number 
     running : boolean 
+    timer : Timer = new Timer()
 
     start(cb : Function) {
         if (!this.running) {
             this.running = true 
-            this.interval = setInterval(cb, delay)
+            this.timer.start()
+            this.loop(cb)
+
+        }
+    }
+
+    loop(cb : Function) {
+        if (this.running) {
+            const diff : number = this.timer.check()
+            cb()
+            requestAnimationFrame(() => {
+                this.loop(cb)
+            })
         }
     }
 
