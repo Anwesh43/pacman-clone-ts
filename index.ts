@@ -6,8 +6,32 @@ const BACKGROUND_COLOR : string = "#bdbdbd"
 const SPEED : number = 10 
 const OPENING_SPEED : number = 5 
 const MAX_DEG : number = 30 
+const PAC_MAN_RFACTOR : number = 12.3 
 
 const toRadians : Function = (deg : number) : number => deg * Math.PI / 180
+
+class DrawingUtil {
+
+    static drawCenteredArc(
+        context : CanvasRenderingContext2D,
+        cx : number,
+        cy : number,
+        r : number,
+        startDeg : number = 0,
+        endDeg : number = 360
+    ) {
+        context.save()
+        context.beginPath()
+        context.moveTo(cx, cy)
+        for (let j = startDeg; j <= endDeg; j++) {
+            const x : number = cx + r * Math.cos(toRadians(j))
+            const y : number = cy + r * Math.sin(toRadians(j))
+            context.lineTo(x, y)
+        }
+        context.fill()
+        context.restore()
+    }
+}
 
 class Stage {
 
@@ -93,13 +117,13 @@ class Loop {
 
 class PacmanState {
 
-    x : number = 0
-    y : number = 0
-    xDir : number = 1 // {1, -1, 0}
-    yDir : number = 0 // {1, -1, 0}
-    angle : number = 0 //{0 >MAX_DEG, MAX_DEG -> 0}
-    dirAngle : number = 0  // {0, 180, 270, 90}
-    openingDir : number = 1 //{1, -1} 
+    private x : number = 0
+    private y : number = 0
+    private xDir : number = 1 // {1, -1, 0}
+    private yDir : number = 0 // {1, -1, 0}
+    private angle : number = 0 //{0 >MAX_DEG, MAX_DEG -> 0}
+    private dirAngle : number = 0  // {0, 180, 270, 90}
+    private openingDir : number = 1 //{1, -1} 
 
     move() {
         this.x += this.xDir * SPEED 
@@ -143,7 +167,49 @@ class PacmanState {
         this.xDir = 0 
         this.yDir = 1
     }
+
+    render(cb : Function) {
+        cb(this.x, this.y, this.angle, this.dirAngle)
+    }
 }
+
+class PacMan {
+
+    state : PacmanState = new PacmanState()
+    
+    draw(context : CanvasRenderingContext2D) {
+        const pacManRadius : number = Math.min(w, h) / PAC_MAN_RFACTOR
+        context.fillStyle = PAC_MAN_COLOR
+        this.state.render((x : number, y : number, angle : number, dirAngle : number) => {
+            context.save()
+            context.translate(x, y)
+            context.rotate(dirAngle)
+            DrawingUtil.drawCenteredArc(context, 0, 0, pacManRadius, angle, 360 - angle)
+            context.restore()
+        })
+    } 
+
+    move() {
+       this.state.move() 
+    }
+
+    toLeft() {
+        this.state.toLeft()
+    }
+
+    toRight() {
+        this.state.toRight()
+    }
+
+    toDown() {
+        this.state.toDown()
+    }
+
+    toUp() {
+        this.state.toUp()
+    }
+
+} 
 
 Stage.init()
 
