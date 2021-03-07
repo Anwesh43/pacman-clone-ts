@@ -120,11 +120,24 @@ class PacmanState {
     private angle : number = 0 //{0 >MAX_DEG, MAX_DEG -> 0}
     private dirAngle : number = 0  // {0, 180, 270, 90}
     private openingDir : number = 1 //{1, -1} 
+    private pacManRadius : number = Math.min(w, h) / PAC_MAN_RFACTOR
 
     move() {
         this.x += this.xDir * SPEED 
         this.y += this.yDir * SPEED
         this.angle += this.openingDir * OPENING_SPEED
+        if (this.x > w + this.pacManRadius) {
+            this.x = -this.pacManRadius
+        }
+        if (this.x < -this.pacManRadius) {
+            this.x = w + this.pacManRadius 
+        }
+        if (this.y > h + this.pacManRadius) {
+            this.y = -this.pacManRadius 
+        }
+        if (this.y < -this.pacManRadius) {
+            this.y = h + this.pacManRadius
+        }
         if (this.angle >= MAX_DEG) {
             this.openingDir = -1
         } else if (this.angle <= 0) {
@@ -165,7 +178,7 @@ class PacmanState {
     }
 
     render(cb : Function) {
-        cb(this.x, this.y, this.angle, this.dirAngle)
+        cb(this.x, this.y, this.angle, this.dirAngle, this.pacManRadius)
     }
 }
 
@@ -174,9 +187,8 @@ class PacMan {
     state : PacmanState = new PacmanState()
     
     draw(context : CanvasRenderingContext2D) {
-        const pacManRadius : number = Math.min(w, h) / PAC_MAN_RFACTOR
         context.fillStyle = PAC_MAN_COLOR
-        this.state.render((x : number, y : number, angle : number, dirAngle : number) => {
+        this.state.render((x : number, y : number, angle : number, dirAngle : number, pacManRadius : number) => {
             context.save()
             context.translate(x, y)
             context.rotate(dirAngle)
