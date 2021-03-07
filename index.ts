@@ -1,6 +1,6 @@
 const w : number = window.innerWidth 
 const h : number = window.innerHeight 
-const delay : number = 1000
+const delay : number = 60
 const PAC_MAN_COLOR : string = "orange"
 const BACKGROUND_COLOR : string = "#bdbdbd"
 const SPEED : number = 10 
@@ -78,15 +78,11 @@ class Stage {
 
 class Renderer {
 
-    k : number = 0 
+    pacMan : PacMan = new PacMan()
 
     render(context : CanvasRenderingContext2D) {
-        context.font = context.font.replace(/\d+/g, '100')
-        const text : string = `Hello:${this.k}`
-        context.fillStyle = 'green'
-        const {width : tw} = context.measureText(text) //{width : } ->> tw 
-        context.fillText(text, w / 2 - tw / 2, h / 2)
-        this.k++;
+        this.pacMan.draw(context)
+        this.pacMan.move()
     }
 
     handleKey(cb : Function) {
@@ -117,8 +113,8 @@ class Loop {
 
 class PacmanState {
 
-    private x : number = 0
-    private y : number = 0
+    private x : number = w / 20
+    private y : number = h / 2
     private xDir : number = 1 // {1, -1, 0}
     private yDir : number = 0 // {1, -1, 0}
     private angle : number = 0 //{0 >MAX_DEG, MAX_DEG -> 0}
