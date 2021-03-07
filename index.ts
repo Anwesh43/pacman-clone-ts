@@ -12,6 +12,7 @@ class Stage {
 
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D 
+    renderer : Renderer = new Renderer()
 
 
     initCanvas() {
@@ -24,8 +25,7 @@ class Stage {
     render() {
         this.context.fillStyle = BACKGROUND_COLOR 
         this.context.fillRect(0, 0, w, h)
-        this.context.fillStyle = 'green'
-        this.context.fillText("Hello World", w / 2, h / 2)
+        this.renderer.render(this.context)
     }
 
     handleKeyDown() {
@@ -43,4 +43,21 @@ class Stage {
     
 }
 
+class Renderer {
+
+    k : number = 0 
+    render(context : CanvasRenderingContext2D) {
+        context.font = context.font.replace(/\d+/g, '100')
+        const text : string = `Hello:${this.k}`
+        context.fillStyle = 'green'
+        const {width : tw} = context.measureText(text) //{width : } ->> tw 
+        context.fillText(text, w / 2 - tw / 2, h / 2)
+    }
+
+    handleKey(cb : Function) {
+
+    }
+}
+
 Stage.init()
+
