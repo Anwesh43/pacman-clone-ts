@@ -1,5 +1,5 @@
-const w : number = window.innerWidth 
-const h : number = window.innerHeight 
+const w : number = window.innerWidth * 0.8 
+const h : number = window.innerHeight * 0.8 
 const delay : number = 60
 const PAC_MAN_COLOR : string = "orange"
 const BACKGROUND_COLOR : string = "#bdbdbd"
@@ -55,8 +55,8 @@ class Stage {
     }
 
     handleKeyDown() {
-        window.onkeydown = (e) => {
-
+        window.onkeydown = (e : KeyboardEvent) => {
+            this.renderer.handleKey(e.code)
         }
     }
 
@@ -85,7 +85,22 @@ class Renderer {
         this.pacMan.move()
     }
 
-    handleKey(cb : Function) {
+    handleKey(code : string) {
+        const codeFnMap : Record<string, Function> = {
+            "ArrowUp": () => {
+                this.pacMan.toUp()
+            },
+            "ArrowDown": () => {
+                this.pacMan.toDown()
+            },
+            "ArrowLeft": () => {
+                this.pacMan.toLeft()
+            },
+            "ArrowRight": () => {
+                this.pacMan.toRight()
+            }
+        };
+        codeFnMap[code]()
 
     }
 
@@ -191,7 +206,7 @@ class PacMan {
         this.state.render((x : number, y : number, angle : number, dirAngle : number, pacManRadius : number) => {
             context.save()
             context.translate(x, y)
-            context.rotate(dirAngle)
+            context.rotate(toRadians(dirAngle))
             DrawingUtil.drawCenteredArc(context, 0, 0, pacManRadius, angle, 360 - angle)
             context.restore()
         })
